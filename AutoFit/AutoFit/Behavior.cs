@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms.Internals;
 using Syncfusion.ListView.XForms.Control.Helpers;
+using Syncfusion.GridCommon.ScrollAxis;
+using Syncfusion.ListView.XForms;
 
 namespace AutoFit
 {
@@ -15,6 +17,7 @@ namespace AutoFit
         private Contact tappedItem;
         private Syncfusion.ListView.XForms.SfListView listview;
         private AccordionViewModel AccordionViewModel;
+        public VisibleLinesCollection visibleLines;
 
         #endregion
 
@@ -43,41 +46,32 @@ namespace AutoFit
         {
             if (tappedItem != null && tappedItem.IsVisible)
             {
-                var previousIndex = listview.DataSource.DisplayItems.IndexOf(tappedItem);
-
                 tappedItem.IsVisible = false;
-
-                if (Device.RuntimePlatform != Device.macOS)
-                    Device.BeginInvokeOnMainThread(() => { listview.RefreshListViewItem(previousIndex, previousIndex, false); });
             }
 
             if (tappedItem == (e.ItemData as Contact))
             {
-                if (Device.RuntimePlatform == Device.macOS)
-                {
-                    var previousIndex = listview.DataSource.DisplayItems.IndexOf(tappedItem);
-                    Device.BeginInvokeOnMainThread(() => { listview.RefreshListViewItem(previousIndex, previousIndex, false); });
-                }
-
                 tappedItem = null;
                 return;
+            }
+            
+            visibleLines = this.listview.GetVisualContainer().ScrollRows.GetVisibleLines();
+            var tappedItemIndex = listview.DataSource.DisplayItems.IndexOf(e.ItemData as Contact);
+
+            if (visibleLines.Count <= 0)
+                return;
+            var endIndex = visibleLines[visibleLines.LastBodyVisibleIndex].LineIndex;
+            if (tappedItemIndex == endIndex)
+            {
+                Device.BeginInvokeOnMainThread(async () =>
+                {
+                    await Task.Delay(200);
+                    (listview.LayoutManager as LinearLayout).ScrollToRowIndex(tappedItemIndex, Syncfusion.ListView.XForms.ScrollToPosition.End, true);
+                });
             }
 
             tappedItem = e.ItemData as Contact;
             tappedItem.IsVisible = true;
-
-            if (Device.RuntimePlatform == Device.macOS)
-            {
-                var visibleLines = this.listview.GetVisualContainer().ScrollRows.GetVisibleLines();
-                var firstIndex = visibleLines[visibleLines.FirstBodyVisibleIndex].LineIndex;
-                var lastIndex = visibleLines[visibleLines.LastBodyVisibleIndex].LineIndex;
-                Device.BeginInvokeOnMainThread(() => { listview.RefreshListViewItem(firstIndex, lastIndex, false); });
-            }
-            else
-            {
-                var currentIndex = listview.DataSource.DisplayItems.IndexOf(e.ItemData);
-                Device.BeginInvokeOnMainThread(() => { listview.RefreshListViewItem(currentIndex, currentIndex, false); });
-            }
         }
 
         #endregion
