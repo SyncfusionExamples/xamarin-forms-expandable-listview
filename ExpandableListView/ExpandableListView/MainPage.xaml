@@ -5,12 +5,13 @@
              xmlns:local="clr-namespace:ExpandableListView"
              xmlns:sflistview="clr-namespace:Syncfusion.ListView.XForms;assembly=Syncfusion.SfListView.XForms">
 
-    <ContentPage.BindingContext>
-        <local:AccordionViewModel/>
-    </ContentPage.BindingContext>
+    <ContentPage.Behaviors>
+        <local:Behavior/>
+    </ContentPage.Behaviors>
+
     <ContentPage.Content>
         <Grid x:Name="mainGrid" BackgroundColor="#F0F0F0" Padding="4">
-            <sflistview:SfListView x:Name="listView" AutoFitMode="Height" SelectionMode ="None" ItemsSource="{Binding ContactsInfo}" IsScrollBarVisible="False" ItemSpacing="0">
+            <sflistview:SfListView x:Name="listView" AutoFitMode="Height" SelectionMode ="None" IsScrollBarVisible="False" ItemSpacing="0">
                 <sflistview:SfListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -26,7 +27,7 @@
                                             </Grid.RowDefinitions>
                                             <Grid x:Name="grid" RowSpacing="0" Padding="0,4,0,0">
                                                 <Grid.GestureRecognizers>
-                                                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding .}"/>
+                                                    <TapGestureRecognizer Command="{Binding Path=BindingContext.TapGestureCommand, Source={x:Reference listView}}" CommandParameter="{Binding .}"/>
                                                 </Grid.GestureRecognizers>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="60" />
@@ -43,36 +44,8 @@
                                                             <RowDefinition Height="*" />
                                                             <RowDefinition Height="*" />
                                                         </Grid.RowDefinitions>
-                                                        <Label Grid.Row="0" LineBreakMode="NoWrap" TextColor="#474747" Text="{Binding ContactName}">
-                                                            <Label.FontSize>
-                                                                <OnPlatform x:TypeArguments="x:Double">
-                                                                    <OnPlatform.WinPhone>
-                                                                        <OnIdiom x:TypeArguments="x:Double" Phone="18" Tablet="20" Desktop="20" />
-                                                                    </OnPlatform.WinPhone>
-                                                                    <OnPlatform.Android>
-                                                                        <OnIdiom x:TypeArguments="x:Double" Phone="16" Tablet="18" />
-                                                                    </OnPlatform.Android>
-                                                                    <OnPlatform.iOS>
-                                                                        <OnIdiom x:TypeArguments="x:Double" Phone="16" Tablet="18" />
-                                                                    </OnPlatform.iOS>
-                                                                </OnPlatform>
-                                                            </Label.FontSize>
-                                                        </Label>
-                                                        <Label Grid.Row="1" TextColor="#474747" LineBreakMode="NoWrap" Text="{Binding CallTime}">
-                                                            <Label.FontSize>
-                                                                <OnPlatform x:TypeArguments="x:Double">
-                                                                    <OnPlatform.WinPhone>
-                                                                        <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="12" Desktop="12" />
-                                                                    </OnPlatform.WinPhone>
-                                                                    <OnPlatform.Android>
-                                                                        <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="14" />
-                                                                    </OnPlatform.Android>
-                                                                    <OnPlatform.iOS>
-                                                                        <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="14" />
-                                                                    </OnPlatform.iOS>
-                                                                </OnPlatform>
-                                                            </Label.FontSize>
-                                                        </Label>
+                                                        <Label Grid.Row="0" LineBreakMode="NoWrap" TextColor="#474747" Text="{Binding ContactName}"/>
+                                                        <Label Grid.Row="1" TextColor="#474747" LineBreakMode="NoWrap" Text="{Binding CallTime}"/>
                                                     </Grid>
                                                     <Grid Grid.Row="0" Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
                                                         <Image Source="{Binding PhoneImage}" Opacity="0.60" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" />

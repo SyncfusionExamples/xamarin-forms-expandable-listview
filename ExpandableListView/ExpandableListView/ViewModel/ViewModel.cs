@@ -1,4 +1,5 @@
 ﻿using Syncfusion.ListView.XForms;
+using Syncfusion.ListView.XForms.Control.Helpers;
 using Syncfusion.ListView.XForms.Helpers;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,9 @@ namespace ExpandableListView
         #region Properties
 
         public ObservableCollection<Contact> ContactsInfo { get; set; }
+        private Contact TappedItem;
+        internal SfListView listView;
+        public Command<object> TapGestureCommand { get; set; }
 
         #endregion
 
@@ -49,6 +53,49 @@ namespace ExpandableListView
                 ContactsInfo.Add(contact);
                 counter++;
 
+            }
+            TapGestureCommand = new Command<object>(TappedGestureCommandMethod);
+        }
+
+        private void TappedGestureCommandMethod(object obj)
+        {
+            var tappedItemData = obj as Contact;
+            if (TappedItem != null && TappedItem.IsVisible)
+            {
+                var previousIndex = listView.DataSource.DisplayItems.IndexOf(TappedItem);
+
+                TappedItem.IsVisible = false;
+
+                if (Device.RuntimePlatform != Device.macOS)
+                    Device.BeginInvokeOnMainThread(() => { listView.RefreshListViewItem(previousIndex, previousIndex, false); });
+            }
+
+            if (TappedItem == tappedItemData)
+            {
+                if (Device.RuntimePlatform == Device.macOS)
+                {
+                    var previousIndex = listView.DataSource.DisplayItems.IndexOf(TappedItem);
+                    Device.BeginInvokeOnMainThread(() => { listView.RefreshListViewItem(previousIndex, previousIndex, false); });
+                }
+
+                TappedItem = null;
+                return;
+            }
+
+            TappedItem = tappedItemData;
+            TappedItem.IsVisible = true;
+
+            if (Device.RuntimePlatform == Device.macOS)
+            {
+                var visibleLines = listView.GetVisualContainer().ScrollRows.GetVisibleLines();
+                var firstIndex = visibleLines[visibleLines.FirstBodyVisibleIndex].LineIndex;
+                var lastIndex = visibleLines[visibleLines.LastBodyVisibleIndex].LineIndex;
+                Device.BeginInvokeOnMainThread(() => { listView.RefreshListViewItem(firstIndex, lastIndex, false); });
+            }
+            else
+            {
+                var currentIndex = listView.DataSource.DisplayItems.IndexOf(tappedItemData);
+                Device.BeginInvokeOnMainThread(() => { listView.RefreshListViewItem(currentIndex, currentIndex, false); });
             }
         }
 
