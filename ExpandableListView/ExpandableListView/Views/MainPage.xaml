@@ -11,7 +11,7 @@
 
     <ContentPage.Content>
         <Grid x:Name="mainGrid" BackgroundColor="#F0F0F0" Padding="4">
-            <sflistview:SfListView x:Name="listView" AutoFitMode="Height" SelectionMode ="None" IsScrollBarVisible="False" ItemSpacing="0">
+            <sflistview:SfListView x:Name="listView" AutoFitMode="DynamicHeight" SelectionMode ="None" IsScrollBarVisible="False" ItemSpacing="0">
                 <sflistview:SfListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
